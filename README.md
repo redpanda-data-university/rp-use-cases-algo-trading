@@ -2,7 +2,7 @@
 [Redpanda University][rpu] is a series of courses that will teach you the basics of event streaming, and will help you gain hands-on experience with a new data streaming platform called [Redpanda][rp].
 
 ## RP Use Cases: Algorithmic Trading
-This repository contains code examples for the Algorithmic Trading course from [Redpanda University][rpu]. The following lessons are included:
+This repository contains code examples for the Algorithmic Trading course from [Redpanda University][rpu].
 
 [rp]: https://redpanda.com/
 [rpu]: https://university.redpanda.com/
