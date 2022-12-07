@@ -4,6 +4,7 @@
 ## RP Use Cases: Algorithmic Trading
 This repository contains code examples for the Algorithmic Trading course from [Redpanda University][rpu]. The following lessons are included:
 
+[rp]: https://redpanda.com/
 [rpu]: https://university.redpanda.com/
 
 ## Getting Started
