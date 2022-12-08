@@ -35,7 +35,7 @@ services:
 
   # Want a two node Redpanda cluster? Uncomment this block :)
   # redpanda-2:
-  #   image: docker.redpanda.com/vectorized/redpanda:v22.2.2
+  #   image: docker.redpanda.com/vectorized/redpanda:v22.3.5
   #   container_name: redpanda-2
   #   command:
   #     - redpanda
@@ -65,8 +65,32 @@ services:
   #     - 8083:8083
   #     - 9093:9093
 
+  redpanda-console:
+    image: docker.redpanda.com/vectorized/console:v2.1.1
+    container_name: redpanda-console
+    entrypoint: /bin/sh
+    command: -c "echo \"$$CONSOLE_CONFIG_FILE\" > /tmp/config.yml; /app/console"
+    environment:
+      CONFIG_FILEPATH: /tmp/config.yml
+      CONSOLE_CONFIG_FILE: |
+        kafka:
+          brokers: ["redpanda-1:29092", "redpanda-2:29092"]
+          schemaRegistry:
+            enabled: false
+        redpanda:
+          adminApi:
+            enabled: true
+            urls: ["http://redpanda-1:9644"]
+        connect:
+          enabled: false
+    ports:
+      - 8080:8080
+    depends_on:
+      - redpanda-1
+
   # Flink cluster
   jobmanager:
+    container_name: jobmanager
     build:
       context: .
       dockerfile: Dockerfile
@@ -79,6 +103,7 @@ services:
         jobmanager.rpc.address: jobmanager        
 
   taskmanager:
+    container_name: taskmanager
     build:
       context: .
       dockerfile: Dockerfile
@@ -93,6 +118,7 @@ services:
         taskmanager.numberOfTaskSlots: 2 
        
   sql-client:
+    container_name: sql-client
     build:
       context: .
       dockerfile: Dockerfile
