@@ -57,3 +57,5 @@ FROM
   (VALUES ('Flink'), ('Redpanda'), ('Alpaca')) AS NameTable(name)
 GROUP BY name;
 ```
+
+Each chapter will contain a set of queries for you to execute. Please see in the [individual chapters](#rp-use-cases-algorithmic-trading) for more information.
