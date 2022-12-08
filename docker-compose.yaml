@@ -2,7 +2,7 @@ version: '3.7'
 services:
   # Redpanda cluster
   redpanda-1:
-    image: docker.redpanda.com/vectorized/redpanda:v22.2.2
+    image: docker.redpanda.com/vectorized/redpanda:v22.3.5
     container_name: redpanda-1
     command:
       - redpanda
@@ -32,7 +32,8 @@ services:
       - 9092:9092
       - 28082:28082
       - 29092:29092
-  # uncomment for a two-node cluster
+
+  # Want a two node Redpanda cluster? Uncomment this block :)
   # redpanda-2:
   #   image: docker.redpanda.com/vectorized/redpanda:v22.2.2
   #   container_name: redpanda-2
@@ -100,6 +101,18 @@ services:
       - embedded
       - -l
       - /opt/sql-client/lib
+
+      # uncomment to run the "Hello, Flink" pipeline from a file
+      # - -f
+      # - /etc/sql/hello_flink.sql
+
+      # uncomment to run the "Trade Stats" pipeline from a file
+      # - -f
+      # - /etc/sql/trade_stats.sql
+
+      # Note: if you don't uncomment one of the pipelines above,
+      # you'll be dropped into a SQL client CLI. This is a great for
+      # experimentation and pipeline development :)
     depends_on:
       - jobmanager
     environment:
@@ -107,3 +120,5 @@ services:
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
         rest.address: jobmanager
+    volumes:
+      - ./01-flink-intro/sql:/etc/sql
