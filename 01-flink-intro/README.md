@@ -90,5 +90,5 @@ docker-compose run sql-client
 
 After submitting the job, visit http://localhost:8081/ to check the status.
 
-[sql]: 01-flink-intro/sql
+[sql]: sql
 [docker-compose]: docker-compose.yaml
