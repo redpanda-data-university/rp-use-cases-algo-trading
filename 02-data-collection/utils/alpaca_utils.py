@@ -116,11 +116,11 @@ def get_historical_prices(
 
         bars = client.get_stock_bars(request_params).df
 
-    df = append_summary_metrics(bars)
+    # df = append_summary_metrics(bars)
 
     # flatten the multi-index to just a timestamp to ease plotting and joining
     # df.index = df.index.get_level_values(1)
-    return df
+    return bars
 
 
 def append_summary_metrics(df):
