@@ -1,9 +1,9 @@
 import json
-import sys
 
 from kafka import KafkaProducer
 
 from config import REDPANDA_BROKERS, SYMBOLS
+from data.providers import ALPACA, DATA_PROVIDER_KEY
 from utils import alpaca_utils
 
 # configs
@@ -20,25 +20,42 @@ redpanda_client = KafkaProducer(
 )
 
 # An async handler that gets called whenever new data is seen
-async def news_callback(data):
-    print("news")
-    print(data)
-    print(type(data))
-    # record = data.dict()
+async def news_callback(row):
+    # The SDK returns a NewsV2 object. row._raw allows us to access the record
+    # in dictionary form
+    article = row._raw
 
-    # # format the timestamp to milliseconds
-    # timestamp_ms = int(record["timestamp"].timestamp() * 1000)
-    # record["timestamp"] = timestamp_ms
+    # Covert the timestamp to milliseconds
+    timestamp_ms = int(row.created_at.timestamp() * 1000)
+    article["timestamp_ms"] = timestamp_ms
 
-    # # produce to Redpanda
-    # _ = redpanda_client.send(
-    #     REDPANDA_TOPIC,
-    #     key=record["symbol"],
-    #     value=record,
-    #     timestamp_ms=record["timestamp"],
-    # )
+    # Add an identifier for the data provider
+    article[DATA_PROVIDER_KEY] = ALPACA
 
-    # print(f"Produced record to Redpanda topic: {REDPANDA_TOPIC}. Record: {record}")
+    # The article may relate to multiple symbols. Produce a separate record
+    # each matched search symbol.
+    article_symbols = article.pop("symbols")
+
+    for search_symbol in SYMBOLS:
+        if not search_symbol in article_symbols:
+            continue
+
+        article["symbol"] = search_symbol
+
+        # Produce the news article to Redpanda
+        try:
+            future = redpanda_client.send(
+                REDPANDA_TOPIC,
+                key=search_symbol,
+                value=article,
+                timestamp_ms=timestamp_ms,
+            )
+
+            # Block until the message is sent (or timeout).
+            _ = future.get(timeout=10)
+
+        except Exception as e:
+            print(e)
 
 
 stream = alpaca_utils.get_legacy_stream_client()
