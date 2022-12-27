@@ -1,5 +1,3 @@
-SET 'pipeline.name' = 'DDL';
-
 CREATE OR REPLACE TABLE price_updates (
     symbol VARCHAR,
     `open` FLOAT,
@@ -9,8 +7,6 @@ CREATE OR REPLACE TABLE price_updates (
     volume DECIMAL,
     trade_count FLOAT,
     vwap DECIMAL,
-    minutely_return DECIMAL,
-    cumulative_return DECIMAL,
     `timestamp` BIGINT,
     time_ltz AS TO_TIMESTAMP_LTZ(`timestamp`, 3),
     -- declare time_ltz as event time attribute and use 5 seconds delayed watermark strategy
