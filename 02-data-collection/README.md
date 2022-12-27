@@ -37,7 +37,7 @@ In Chapter 2 of the Algorithmic Trading course, we explore how to collect variou
 
 4. [Sign up for an Alpaca account][alpaca-signup].
 5. Create an API key from [the Alpaca Paper Trading dashboard][alpaca-paper-trading].
-6. Replace the following lines in the .env file with your API key and secret
+6. Replace the following lines in the [.env](.env) file with your API key and secret
 
     ```python
     ALPACA_API_KEY="<YOUR_ALPACA_KEY_ID>"
@@ -50,7 +50,7 @@ In Chapter 2 of the Algorithmic Trading course, we explore how to collect variou
 ## Producing Data
 Make sure to follow all of the steps in the **Setup** section first before running these commands.
 
-1. Pull historical price data for the symbols and time range listed in the [config file](02-data-collection/config/__init__.py).
+1. Pull historical price data for the symbols and time range listed in the [config file](config/__init__.py).
     ```sh
     python -m examples.alpaca.historical_prices
     
@@ -59,7 +59,7 @@ Make sure to follow all of the steps in the **Setup** section first before runni
     Produced 670 records to Redpanda topic: price-updates
     ```
 
-2. Pull historical market news for the symbols and time range listed in the [config file](02-data-collection/config/__init__.py).
+2. Pull historical market news for the symbols and time range listed in the [config file](config/__init__.py).
 
     ```sh
     python -m examples.alpaca.historical_news
@@ -69,13 +69,13 @@ Make sure to follow all of the steps in the **Setup** section first before runni
     Produced 426 records to Redpanda topic: market-news
     ```
 
-3. Pull live price data for the symbols listed in the [config file](02-data-collection/config/__init__.py). Note: this will only work if running during trading hours.
+3. Pull live price data for the symbols listed in the [config file](config/__init__.py). Note: this will only work if running during trading hours.
 
     ```sh
     python -m examples.alpaca.live_prices
     ```
 
-4. Pull live news for the symbols listed in the [config file](02-data-collection/config/__init__.py). Note: this may not pull anything immediately.
+4. Pull live news for the symbols listed in the [config file](config/__init__.py). Note: this may not pull anything immediately.
 
     ```sh
     python -m examples.alpaca.live_news
