@@ -6,7 +6,8 @@ In Chapter 2 of the Algorithmic Trading course, we explore how to collect variou
     ```sh
     cd 02-data-collection/
     ```
-2. Create a Python virtual environment and install all dependencies.
+2. Ensure you have [Python >= 3.7][python] installed
+3. Create a Python virtual environment and install all dependencies.
     ```sh
     # create a virtual environment
     python3 -m venv .
@@ -18,7 +19,7 @@ In Chapter 2 of the Algorithmic Trading course, we explore how to collect variou
     pip install -r requirements.txt
     ```
    
-3. Start the Redpanda and Flink clusters.
+4. Start the Redpanda and Flink clusters.
 
     ```sh
     # start the containers
@@ -35,9 +36,9 @@ In Chapter 2 of the Algorithmic Trading course, we explore how to collect variou
     - The Flink web interface will be available at: http://localhost:8081.
     - The Redpanda console will be available at: http://localhost:8080.
 
-4. [Sign up for an Alpaca account][alpaca-signup].
-5. Create an API key from [the Alpaca Paper Trading dashboard][alpaca-paper-trading].
-6. Replace the following lines in the [.env](.env) file with your API key and secret
+5. [Sign up for an Alpaca account][alpaca-signup].
+6. Create an API key from [the Alpaca Paper Trading dashboard][alpaca-paper-trading].
+7. Replace the following lines in the [.env](.env) file with your API key and secret
 
     ```python
     ALPACA_API_KEY="<YOUR_ALPACA_KEY_ID>"
@@ -46,6 +47,7 @@ In Chapter 2 of the Algorithmic Trading course, we explore how to collect variou
 
 [alpaca-signup]: https://alpaca.markets/
 [alpaca-paper-trading]: https://app.alpaca.markets/paper/dashboard/overview
+[python]: https://www.python.org/downloads/
 
 ## Producing Data
 Make sure to follow all of the steps in the **Setup** section first before running these commands.
