@@ -5,7 +5,7 @@
 This repository contains code examples for the Algorithmic Trading course from [Redpanda University][rpu]. The following chapters are included:
 
 - [Chapter 1: Flink intro][flink-intro] (creating Redpanda-backed Flink pipelines)
--  Chapter 2 (WIP)
+- [Chapter 2: Data Collection][data-collection]
 -  Chapter 3 (WIP)
 
 
@@ -13,6 +13,7 @@ This repository contains code examples for the Algorithmic Trading course from [
 [rpu]: https://university.redpanda.com/
 
 [flink-intro]: /01-flink-intro
+[data-collection]: /02-data-collection
 
 ## Getting Started
 To start the Redpanda and Flink clusters, run the following commands:
