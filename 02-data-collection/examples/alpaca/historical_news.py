@@ -8,9 +8,10 @@ from config import (ADDITIONAL_TEXT_FILTERS, BACKFILL_END, BACKFILL_START,
 from data.providers import ALPACA, DATA_PROVIDER_KEY
 from utils import alpaca_utils
 
+# Create a sentiment analyzer
 sia = SIA()
 
-# configs
+# Script-level onfigs
 REDPANDA_TOPIC = "market-news"
 
 # Pull live data from Alpaca
@@ -43,7 +44,9 @@ for i, row in enumerate(news):
     # in dictionary form
     article = row._raw
 
-    # Apply additional text filters
+    # Apply additional text filters to reduce the noise. e.g. if the additional
+    # text filters are set to ["Apple", "Tesla"], then the headline must also
+    # include the words "Apple" or "Tesla".
     should_proceed = False
     for term in ADDITIONAL_TEXT_FILTERS:
         if term in article["headline"]:
@@ -63,7 +66,7 @@ for i, row in enumerate(news):
     article["sentiment"] = get_sentiment(article["headline"])
 
     # The article may relate to multiple symbols. Produce a separate record
-    # each matched search symbol.
+    # for each matched search symbol.
     article_symbols = article.pop("symbols")
 
     for search_symbol in SYMBOLS:
