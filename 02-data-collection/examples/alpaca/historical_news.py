@@ -1,10 +1,14 @@
 import json
 
 from kafka import KafkaProducer
+from nltk.sentiment.vader import SentimentIntensityAnalyzer as SIA
 
-from config import BACKFILL_END, BACKFILL_START, REDPANDA_BROKERS, SYMBOLS
+from config import (ADDITIONAL_TEXT_FILTERS, BACKFILL_END, BACKFILL_START,
+                    REDPANDA_BROKERS, SYMBOLS)
 from data.providers import ALPACA, DATA_PROVIDER_KEY
 from utils import alpaca_utils
+
+sia = SIA()
 
 # configs
 REDPANDA_TOPIC = "market-news"
@@ -24,6 +28,12 @@ news = alpaca_utils.get_historical_news_data(
     SYMBOLS, BACKFILL_START, BACKFILL_END, limit=10_000
 )
 
+
+def get_sentiment(text):
+    scores = sia.polarity_scores(text)
+    return scores["compound"]
+
+
 success_count = 0
 error_count = 0
 
@@ -33,12 +43,24 @@ for i, row in enumerate(news):
     # in dictionary form
     article = row._raw
 
+    # Apply additional text filters
+    should_proceed = False
+    for term in ADDITIONAL_TEXT_FILTERS:
+        if term in article["headline"]:
+            proceed = True
+
+    if not should_proceed:
+        continue
+
     # Covert the timestamp to milliseconds
     timestamp_ms = int(row.created_at.timestamp() * 1000)
     article["timestamp_ms"] = timestamp_ms
 
     # Add an identifier for the data provider
     article[DATA_PROVIDER_KEY] = ALPACA
+
+    # Calculate the sentiment
+    article["sentiment"] = get_sentiment(article["headline"])
 
     # The article may relate to multiple symbols. Produce a separate record
     # each matched search symbol.

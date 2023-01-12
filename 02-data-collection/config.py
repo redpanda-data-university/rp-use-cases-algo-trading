@@ -19,8 +19,8 @@ REDPANDA_BROKERS = os.getenv("REDPANDA_BROKERS", "localhost:9092")
 REDPANDA_CONSUMER_GROUP = os.getenv("REDPANDA_CONSUMER_GROUP", "test")
 
 # Data pull configs
-BACKFILL_START = "2022-01-01"
-BACKFILL_END = "2022-02-02"
+BACKFILL_START = "2022-09-01"
+BACKFILL_END = "2023-01-01"
 
 # Set to True if you are pulling Crypto data. Note: you cannot
 # pull data for crypto and stock symbols at the same time. So
@@ -29,4 +29,5 @@ CRYPTO = False
 
 # Symbols to pull data for (backfill and live).
 # Note: Crypto symbols are formatted like so: "BTC/USD", "ETH/USD", etc
-SYMBOLS = ["AAPL", "COIN"]
+SYMBOLS = ["TSLA"]
+ADDITIONAL_TEXT_FILTERS = ["Tesla"]

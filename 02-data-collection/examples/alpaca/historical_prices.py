@@ -19,7 +19,7 @@ df = alpaca_utils.get_historical_prices(
     start=BACKFILL_START,
     end=BACKFILL_END,
     crypto=CRYPTO,
-    granularity=TimeFrame.Hour,  # Minute, Hour, Day, Week, Month
+    granularity=TimeFrame.Minute,  # Minute, Hour, Day, Week, Month
 )
 
 # Convert the timestamp index to a column in the dataframe
