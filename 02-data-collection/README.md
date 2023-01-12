@@ -125,6 +125,7 @@ CREATE OR REPLACE TABLE market_news (
     summary VARCHAR,
     `url` VARCHAR,
     symbol VARCHAR,
+    sentiment DECIMAL,
     timestamp_ms BIGINT,
     time_ltz AS TO_TIMESTAMP_LTZ(timestamp_ms, 3),
     -- declare time_ltz as event time attribute and use 5 seconds delayed watermark strategy
