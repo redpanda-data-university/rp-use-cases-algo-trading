@@ -115,7 +115,7 @@ services:
       - |
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
-        taskmanager.numberOfTaskSlots: 2 
+        taskmanager.numberOfTaskSlots: 20
        
   sql-client:
     container_name: sql-client
