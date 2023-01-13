@@ -16,7 +16,23 @@ This repository contains code examples for the Algorithmic Trading course from [
 [data-collection]: /02-data-collection
 
 ## Getting Started
-To start the Redpanda and Flink clusters, run the following commands:
+### Python
+A Python environment is needed to run the producer scripts to get the financial and market news data into Redpanda, and for running a separate consumer to process trade signals.
+
+Create a Python virtual environment and install all dependencies.
+```sh
+# create a virtual environment
+python3 -m venv .
+
+# activate the environment
+source bin/activate
+
+# install dependencies
+pip install -r requirements.txt
+```
+
+### Docker Services
+We need a Redpanda cluster to store the data, and a Flink cluster to create trade signals using Flink SQL. To start the Redpanda and Flink clusters, run the following commands:
 
 ```sh
 docker-compose build
