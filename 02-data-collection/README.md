@@ -57,7 +57,7 @@ Make sure to follow all of the steps in the **Setup** section first before runni
     python -m examples.alpaca.historical_prices
     
     # example output
-    Pulling historical data for symbols: ['AAPL', 'COIN']
+    Pulling historical data for symbols: ['TSLA']
     Produced 670 records to Redpanda topic: price-updates
     ```
 
@@ -67,7 +67,7 @@ Make sure to follow all of the steps in the **Setup** section first before runni
     python -m examples.alpaca.historical_news
     
     # example output
-    Pulling historical news data for symbols: ['AAPL', 'COIN']
+    Pulling historical news data for symbols: ['TSLA']
     Produced 426 records to Redpanda topic: market-news
     ```
 
