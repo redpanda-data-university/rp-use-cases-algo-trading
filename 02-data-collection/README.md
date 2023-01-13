@@ -1,63 +1,28 @@
 ## Chapter 2 - Data Collection
 In Chapter 2 of the Algorithmic Trading course, we explore how to collect various forms of market data (stock and crypto prices, market news, etc) and store that data in Redpanda.
 
-## Setup
-1. Clone this repository and `cd` into the current directory.
+## Prerequisites
+1. Complete the setup steps in the [Getting Started section](../README.md#getting-started)
+2. Confirm you have a Python environment setup, the Docker services running, and an Alpaca API key saved in the [.env](../.env) file
+3. Create the source topics
     ```sh
-    cd 02-data-collection/
-    ```
-2. Ensure you have [Python >= 3.7][python] installed
-3. Create a Python virtual environment and install all dependencies.
-    ```sh
-    # create a virtual environment
-    python3 -m venv .
-
-    # activate the environment
-    source bin/activate
-
-    # install dependencies
-    pip install -r requirements.txt
-    ```
-   
-4. Start the Redpanda and Flink clusters.
-
-    ```sh
-    # start the containers
-    docker-compose up -d
-
-    # set the rpk alias
-    alias rpk="docker exec -ti redpanda-1 rpk"
-
-    # create the source topics
     rpk topic create price-updates market-news
     ```
-    
-    After running the commands...
-    - The Flink web interface will be available at: http://localhost:8081.
-    - The Redpanda console will be available at: http://localhost:8080.
-
-5. [Sign up for an Alpaca account][alpaca-signup].
-6. Create an API key from [the Alpaca Paper Trading dashboard][alpaca-paper-trading].
-7. Replace the following lines in the [.env](.env) file with your API key and secret
-
-    ```python
-    ALPACA_API_KEY="<YOUR_ALPACA_KEY_ID>"
-    ALPACA_SECRET_KEY="<YOUR_ALPACA_SECRET_KEY>"
-    ```
-
-[alpaca-signup]: https://alpaca.markets/
-[alpaca-paper-trading]: https://app.alpaca.markets/paper/dashboard/overview
-[python]: https://www.python.org/downloads/
 
 ## Producing Data
-Make sure to follow all of the steps in the **Setup** section first before running these commands.
+All of the commands in this section should be run for the `02-data-collection` directory:
 
+```
+cd 02-data-collection/
+````
+Make sure to follow all of the steps in the **Prerequisites** section first before running these commands.
+___
 1. Pull historical price data for the symbols and time range listed in the [config file](config/__init__.py).
     ```sh
     python -m examples.alpaca.historical_prices
     
     # example output
-    Pulling historical data for symbols: ['AAPL', 'COIN']
+    Pulling historical data for symbols: ['TSLA']
     Produced 670 records to Redpanda topic: price-updates
     ```
 
@@ -67,7 +32,7 @@ Make sure to follow all of the steps in the **Setup** section first before runni
     python -m examples.alpaca.historical_news
     
     # example output
-    Pulling historical news data for symbols: ['AAPL', 'COIN']
+    Pulling historical news data for symbols: ['TSLA']
     Produced 426 records to Redpanda topic: market-news
     ```
 
