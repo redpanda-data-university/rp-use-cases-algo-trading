@@ -17,13 +17,13 @@ cd 02-data-collection/
 ````
 Make sure to follow all of the steps in the **Prerequisites** section first before running these commands.
 ___
-1. Pull historical price data for the symbols and time range listed in the [config file](config/__init__.py).
+1. Pull historical price data for the symbols and time range listed in the [config file](config/__init__.py). Note the following commands will take several seconds to run and will produce approximately 75,000 records to your local Redpanda cluster.
     ```sh
     python -m examples.alpaca.historical_prices
     
     # example output
     Pulling historical data for symbols: ['TSLA']
-    Produced 670 records to Redpanda topic: price-updates
+    Produced 75481 records to Redpanda topic: price-updates
     ```
 
 2. Pull historical market news for the symbols and time range listed in the [config file](config/__init__.py).
@@ -33,7 +33,7 @@ ___
     
     # example output
     Pulling historical news data for symbols: ['TSLA']
-    Produced 426 records to Redpanda topic: market-news
+    Produced 970 records to Redpanda topic: market-news
     ```
 
 3. Pull live price data for the symbols listed in the [config file](config/__init__.py). Note: this will only work if running during trading hours.
@@ -109,9 +109,9 @@ Now, you can start working with the data. Here are some simple `SELECT` queries 
 
 
 ```sql
-SELECT time_ltz, symbol, `close` FROM price_updates ;
+SELECT time_ltz, symbol, `close` FROM price_updates LIMIT 10;
 
-SELECT time_ltz, symbol, headline FROM market_news ;
+SELECT time_ltz, symbol, headline FROM market_news WHERE sentiment < -0.4 LIMIT 10;
 ```
 
 We'll dig more into the data itself in the next lesson.
