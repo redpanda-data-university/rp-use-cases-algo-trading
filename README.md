@@ -16,7 +16,15 @@ This repository contains code examples for the Algorithmic Trading course from [
 [data-collection]: /02-data-collection
 
 ## Getting Started
-### Python
+There are three steps you need to get started. It should take < 5 minutes.
+
+1. Setup a Python environment
+2. Start the Docker services
+3. Get an Alpaca API key
+
+See the follow sections for detailed instructions.
+
+### Setup a Python Environment
 A Python environment is needed to run the producer scripts to get the financial and market news data into Redpanda, and for running a separate consumer to process trade signals.
 
 Create a Python virtual environment and install all dependencies.
@@ -31,7 +39,7 @@ source bin/activate
 pip install -r requirements.txt
 ```
 
-### Docker Services
+### Start the Docker Services
 We need a Redpanda cluster to store the data, and a Flink cluster to create trade signals using Flink SQL. To start the Redpanda and Flink clusters, run the following commands:
 
 ```sh
@@ -39,7 +47,7 @@ docker-compose build
 docker-compose up -d
 ```
 
-### Redpanda
+#### Redpanda
 Once the clusters are running, Redpanda console will be available at: http://localhost:8080.
 
 To interact with Redpanda from the commandline, set the following alias so that any invocation of `rpk` uses the pre-installed version in your local Redpanda cluster:
@@ -54,7 +62,7 @@ From here, you can use `rpk` to interact with the Redpanda cluster:
 rpk cluster info
 ```
 
-### Flink
+#### Flink
 The Flink web interface will be available at: http://localhost:8081.
 
 To start a Flink SQL client, run the following command:
@@ -76,3 +84,19 @@ GROUP BY name;
 ```
 
 Each chapter will contain a set of queries for you to execute. Please see in the [individual chapters](#rp-use-cases-algorithmic-trading) for more information.
+
+### Get an Alpaca API Key
+We're using Alpaca as the source for market data.
+
+1. [Sign up for an Alpaca account here][alpaca-signup].
+2. Create an API key from [the Alpaca Paper Trading dashboard][alpaca-paper-trading].
+3. Replace the following lines in the [.env file](.env) with your API key and secret
+
+    ```python
+    ALPACA_API_KEY="<YOUR_ALPACA_KEY_ID>"
+    ALPACA_SECRET_KEY="<YOUR_ALPACA_SECRET_KEY>"
+    ```
+
+[alpaca-signup]: https://alpaca.markets/
+[alpaca-paper-trading]: https://app.alpaca.markets/paper/dashboard/overview
+[python]: https://www.python.org/downloads/
