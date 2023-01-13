@@ -38,7 +38,7 @@ In Chapter 2 of the Algorithmic Trading course, we explore how to collect variou
 
 5. [Sign up for an Alpaca account][alpaca-signup].
 6. Create an API key from [the Alpaca Paper Trading dashboard][alpaca-paper-trading].
-7. Replace the following lines in the [.env](.env) file with your API key and secret
+7. Replace the following lines in the [.env file](../.env) with your API key and secret
 
     ```python
     ALPACA_API_KEY="<YOUR_ALPACA_KEY_ID>"
