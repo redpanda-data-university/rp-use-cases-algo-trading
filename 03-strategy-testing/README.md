@@ -16,7 +16,7 @@ In Chapter 3 of the Algorithmic Trading course, we explore how to develop and te
   ```
 
 ## Create Trade Signals
-Create trade signals based on the sentiment of Tesla (TSLA) headlines. To do this, run the queries in the [sql/strategy.sql](03-strategy-testing/sql/strategy.sql) file. Read the query comments to understand what each step is doing.
+Create trade signals based on the sentiment of Tesla (TSLA) headlines. To do this, run the queries in the [sql/strategy.sql](sql/strategy.sql) file. Read the query comments to understand what each step is doing.
 
 This will populate a table called `single_position_trade_signals` with all of the trade signals.
 
