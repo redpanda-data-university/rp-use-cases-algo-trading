@@ -54,7 +54,8 @@ CREATE TABLE raw_trade_signals (
   shares BIGINT,
   signal VARCHAR(4),
   metadata STRING,
-  time_ltz TIMESTAMP(3),
+  -- The METADATA attribute below ensures the timestamp for the Kafka record is set to the time_ltz value
+  time_ltz TIMESTAMP(3) METADATA FROM 'timestamp',
     -- declare time_ltz as event time attribute and use 5 seconds delayed watermark strategy
     WATERMARK FOR time_ltz AS time_ltz - INTERVAL '5' SECOND
 ) WITH (
@@ -110,7 +111,8 @@ CREATE TABLE single_position_trade_signals (
   shares BIGINT,
   signal VARCHAR(4),
   metadata STRING,
-  time_ltz TIMESTAMP(3),
+  -- The METADATA attribute below ensures the timestamp for the Kafka record is set to the time_ltz value
+  time_ltz TIMESTAMP(3) METADATA FROM 'timestamp',
     -- declare time_ltz as event time attribute and use 5 seconds delayed watermark strategy
     WATERMARK FOR time_ltz AS time_ltz - INTERVAL '5' SECOND
 ) WITH (
