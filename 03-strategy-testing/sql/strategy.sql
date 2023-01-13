@@ -1,4 +1,4 @@
--- Create the price updates table
+-- Create the price updates table if you haven't already.
 CREATE OR REPLACE TABLE price_updates (
     symbol VARCHAR,
     `open` FLOAT,
@@ -21,7 +21,7 @@ CREATE OR REPLACE TABLE price_updates (
     'format' = 'json'
 );
 
--- Create the market news table
+-- Create the market news table if you haven't already.
 CREATE OR REPLACE TABLE market_news (
     id BIGINT,
     author VARCHAR,
@@ -44,7 +44,8 @@ CREATE OR REPLACE TABLE market_news (
     'format' = 'json'
 );
 
--- Generate trade signals
+-- Create a table for storing the raw trade signals. They are "raw" because they don't yet take
+-- into account whether or not we currently have an open position when purchasing.
 CREATE TABLE raw_trade_signals (
   strategy STRING,
   strategy_version STRING,
@@ -58,14 +59,16 @@ CREATE TABLE raw_trade_signals (
     WATERMARK FOR time_ltz AS time_ltz - INTERVAL '5' SECOND
 ) WITH (
   'connector' = 'kafka',
-  'topic' = 'trade-signals',
+  'topic' = 'raw-trade-signals',
   'properties.bootstrap.servers' = 'redpanda-1:29092',
   'properties.group.id' = 'signals-consumer',
   'properties.auto.offset.reset' = 'earliest',
   'format' = 'json'
 );
 
--- Insert into trade signals
+-- Implement the sentiment strategy by creating the following signals:
+-- BUY whenever sentment > 0.4
+-- SELL whenever sentiment < -0.4
 INSERT INTO raw_trade_signals
 WITH sentiment_strategy_signals AS (
     SELECT
@@ -95,7 +98,9 @@ FROM sentiment_strategy_signals
 WHERE signal IN ('BUY', 'SELL');
 
 
--- Single position trade signals
+-- Create a table for storing the cleaned trade signals. The idea is to filter down
+-- the raw trade signals so that we only BUY if we don't currently have a position in
+-- the stock.
 CREATE TABLE single_position_trade_signals (
   strategy STRING,
   strategy_version STRING,
@@ -117,6 +122,7 @@ CREATE TABLE single_position_trade_signals (
   'format' = 'json'
 );
 
+-- Insert the single-position trade signals. These will be the signals we actually act upon
 INSERT INTO single_position_trade_signals
 WITH
     buy_sell AS (
@@ -160,7 +166,11 @@ WITH
     FROM trades
     ORDER BY time_ltz;
 
--- Calculate profit and loss for a strategy (doesn't take broker fees into account)
+--------- (Optional) Bonus queries ---------
+
+-- Calculate profit and loss for a strategy
+-- Note: if you aren't using a commission free broker, you'll need to take
+-- the broker fees into account (not shown below since we assume commission-free)
 SELECT
     SUM(amount) as profit_and_loss,
     COUNT(*) as trades,
@@ -169,6 +179,8 @@ FROM single_position_trade_signals
 WHERE strategy = 'sentiment'
 AND strategy_version = '0.1.0'
 AND symbol = 'TSLA';
+
+-- Intuition around the Profit / Loss query we showed earlier
 
 -- Break even test
 SELECT
