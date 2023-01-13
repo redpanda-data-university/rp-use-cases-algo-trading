@@ -50,7 +50,7 @@ for i, row in enumerate(news):
     should_proceed = False
     for term in ADDITIONAL_TEXT_FILTERS:
         if term in article["headline"]:
-            proceed = True
+            should_proceed = True
 
     if not should_proceed:
         continue
