@@ -6,11 +6,11 @@ from kafka import KafkaConsumer
 import json
 import datetime
 
-TOPIC = "trade-signals"
+TOPIC = "raw-trade-signals"
 consumer = KafkaConsumer(
     TOPIC,
     bootstrap_servers=REDPANDA_BROKERS,
-    group_id=REDPANDA_CONSUMER_GROUP + "8",
+    group_id=REDPANDA_CONSUMER_GROUP + "-dev2",
     auto_offset_reset="earliest",
     value_deserializer=lambda value: json.loads(value.decode('utf-8'))
     # add more configs here if you'd like
@@ -29,7 +29,7 @@ try:
             (now - record_time).total_seconds() / 60
         )
         if diff_minutes >= 10:
-           print(f"Too much time has elapsed between the trade signal and the current time.")
+           print(f"Trade signal consumed successfully, but the signal has expired. Simulate news using the the simulate_news script, or wait until more recent news is seen for this symbol.")
            continue
 
         # extract the signal info
