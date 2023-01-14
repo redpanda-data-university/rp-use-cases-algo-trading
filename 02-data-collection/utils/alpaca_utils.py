@@ -9,6 +9,8 @@ from alpaca.data.live import CryptoDataStream, StockDataStream
 from alpaca.data.requests import CryptoBarsRequest, StockBarsRequest
 from alpaca.data.timeframe import TimeFrame
 from alpaca.trading.client import TradingClient
+from alpaca.trading.enums import OrderSide, OrderStatus, TimeInForce
+from alpaca.trading.requests import MarketOrderRequest
 # --------------------------------------------
 #  Alpaca's legacy SDK imports are below
 # --------------------------------------------
@@ -55,7 +57,10 @@ def get_crypto_historical_client():
 
 
 def get_crypto_live_client():
-    return CryptoDataStream(api_key=ALPACA_API_KEY, secret_key=ALPACA_SECRET_KEY,)
+    return CryptoDataStream(
+        api_key=ALPACA_API_KEY,
+        secret_key=ALPACA_SECRET_KEY,
+    )
 
 
 def get_stock_historical_client():
@@ -65,7 +70,10 @@ def get_stock_historical_client():
 
 
 def get_stock_live_client():
-    return StockDataStream(api_key=ALPACA_API_KEY, secret_key=ALPACA_SECRET_KEY,)
+    return StockDataStream(
+        api_key=ALPACA_API_KEY,
+        secret_key=ALPACA_SECRET_KEY,
+    )
 
 
 def get_live_client(*symbols, crypto=False):
@@ -116,18 +124,38 @@ def get_historical_prices(
 
         bars = client.get_stock_bars(request_params).df
 
-    # df = append_summary_metrics(bars)
-
-    # flatten the multi-index to just a timestamp to ease plotting and joining
-    # df.index = df.index.get_level_values(1)
     return bars
 
 
-def append_summary_metrics(df):
-    # minutely return is the percent change of minute price
-    df["minutely_return"] = df["close"].pct_change()
+def has_position(symbol):
+    return symbol in get_trading_client().get_all_positions()
 
-    # cumulative return is the product of each minutely return
-    # (1 + return_1) * (1 + return_2) * …
-    df["cumulative_return"] = df["minutely_return"].add(1).cumprod().sub(1)
-    return df
+
+def get_pending_order_count(symbol):
+    count = 0
+    orders = get_trading_client().get_orders()
+    for order in orders:
+        if order.status == OrderStatus.ACCEPTED and order.filled_at is None:
+            count += 1
+    return count
+
+
+def submit_market_order(symbol, qty, side):
+    position_open = has_position(symbol)
+    pending_orders = get_pending_order_count(symbol)
+    if position_open and side == OrderSide.BUY:
+        print("order not placed. position already open")
+        return
+    elif not position_open and side == OrderSide.SELL:
+        print("order not placed. no positions to close")
+        return
+    elif pending_orders:
+        print("order not placed. current orders pending")
+        return
+    market_order_data = MarketOrderRequest(
+        symbol=symbol,
+        qty=qty,
+        side=side,
+        time_in_force=TimeInForce.FOK,
+    )
+    return get_trading_client().submit_order(order_data=market_order_data)
