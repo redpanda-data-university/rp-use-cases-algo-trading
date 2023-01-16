@@ -131,25 +131,36 @@ def has_position(symbol):
     return symbol in get_trading_client().get_all_positions()
 
 
-def get_pending_order_count(symbol):
+def get_pending_orders(symbol):
     count = 0
     orders = get_trading_client().get_orders()
+    pending = []
     for order in orders:
-        if order.status == OrderStatus.ACCEPTED and order.filled_at is None:
-            count += 1
-    return count
+        if (
+            order.status == OrderStatus.ACCEPTED
+            and order.filled_at is None
+            and order.symbol == symbol
+        ):
+            pending.append(order)
+    return pending
 
 
 def submit_market_order(symbol, qty, side):
     position_open = has_position(symbol)
-    pending_orders = get_pending_order_count(symbol)
+    pending_orders = get_pending_orders(symbol)
+    has_pending = len(pending_orders) > 0
     if position_open and side == OrderSide.BUY:
         print("order not placed. position already open")
+        return
+    elif has_pending and side == OrderSide.SELL:
+        for order in pending_orders:
+            print(f"cancelling order: {order.id}")
+            get_trading_client().cancel_order_by_id(order.id)
         return
     elif not position_open and side == OrderSide.SELL:
         print("order not placed. no positions to close")
         return
-    elif pending_orders:
+    elif has_pending and side == OrderSide.BUY:
         print("order not placed. current orders pending")
         return
     market_order_data = MarketOrderRequest(

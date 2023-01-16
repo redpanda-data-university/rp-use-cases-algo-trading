@@ -1,18 +1,19 @@
-from utils import alpaca_utils
-from alpaca.trading.enums import OrderSide
-from config import REDPANDA_BROKERS, REDPANDA_CONSUMER_GROUP
-
-from kafka import KafkaConsumer
-import json
 import datetime
+import json
 
-TOPIC = "raw- trade-signals"
+from alpaca.trading.enums import OrderSide
+from kafka import KafkaConsumer
+
+from config import REDPANDA_BROKERS, REDPANDA_CONSUMER_GROUP
+from utils import alpaca_utils
+
+TOPIC = "raw-trade-signals"
 consumer = KafkaConsumer(
     TOPIC,
     bootstrap_servers=REDPANDA_BROKERS,
-    group_id=REDPANDA_CONSUMER_GROUP + "-dev2",
+    group_id=REDPANDA_CONSUMER_GROUP,
     auto_offset_reset="earliest",
-    value_deserializer=lambda value: json.loads(value.decode('utf-8'))
+    value_deserializer=lambda value: json.loads(value.decode("utf-8"))
     # add more configs here if you'd like
 )
 
@@ -25,12 +26,12 @@ try:
         # we don't want to trade with old signals
         record_time = datetime.datetime.fromtimestamp(msg.timestamp / 1000)
         now = datetime.datetime.now()
-        diff_minutes = int(
-            (now - record_time).total_seconds() / 60
-        )
+        diff_minutes = int((now - record_time).total_seconds() / 60)
         if diff_minutes >= 10:
-           print(f"Trade signal consumed successfully, but the signal has expired. Simulate news using the the simulate_news script, or wait until more recent news is seen for this symbol.")
-           continue
+            print(
+                f"Trade signal consumed successfully, but the signal has expired. Simulate news using the the simulate_news script, or wait until more recent news is seen for this symbol."
+            )
+            continue
 
         # extract the signal info
         symbol = value["symbol"]
@@ -48,7 +49,7 @@ try:
 
         # try to submit the order
         print(f"Submitting {side} order for {qty} shares of {symbol}")
-        alpaca_utils.submit_market_order('TSLA', 1, OrderSide.BUY)
+        alpaca_utils.submit_market_order("TSLA", 1, side)
 except:
     print("Could not consume from topic: {self.topic}")
     raise
