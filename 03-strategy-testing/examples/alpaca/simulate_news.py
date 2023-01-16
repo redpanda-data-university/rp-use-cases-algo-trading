@@ -44,7 +44,7 @@ while True:
     article["symbol"] = symbol
     article["headline"] = headline
     article["timestamp_ms"] = int(time() * 1000)
-    article["data_provider"] = "News Simulator"
+    article["data_provider"] = "news simulator"
     article["sentiment"] = get_sentiment(article["headline"])
 
     # Produce the simulated news article to Redpanda

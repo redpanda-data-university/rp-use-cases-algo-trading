@@ -16,7 +16,7 @@ CREATE OR REPLACE TABLE price_updates (
     'connector' = 'kafka',
     'topic' = 'price-updates',
     'properties.bootstrap.servers' = 'redpanda-1:29092',
-    'properties.group.id' = 'test-group2',
+    'properties.group.id' = 'test-group-1',
     'properties.auto.offset.reset' = 'earliest',
     'format' = 'json'
 );
@@ -28,6 +28,7 @@ CREATE OR REPLACE TABLE market_news (
     headline VARCHAR,
     source VARCHAR,
     summary VARCHAR,
+    data_provider VARCHAR,
     `url` VARCHAR,
     symbol VARCHAR,
     sentiment DECIMAL,
@@ -39,7 +40,7 @@ CREATE OR REPLACE TABLE market_news (
     'connector' = 'kafka',
     'topic' = 'market-news',
     'properties.bootstrap.servers' = 'redpanda-1:29092',
-    'properties.group.id' = 'test-group2',
+    'properties.group.id' = 'test-group-1',
     'properties.auto.offset.reset' = 'earliest',
     'format' = 'json'
 );
@@ -54,6 +55,7 @@ CREATE TABLE raw_trade_signals (
   shares BIGINT,
   signal VARCHAR(4),
   metadata STRING,
+  data_provider STRING,
   -- The METADATA attribute below ensures the timestamp for the Kafka record is set to the time_ltz value
   time_ltz TIMESTAMP(3) METADATA FROM 'timestamp',
     -- declare time_ltz as event time attribute and use 5 seconds delayed watermark strategy
@@ -71,7 +73,8 @@ CREATE TABLE raw_trade_signals (
 -- BUY whenever sentment > 0.4
 -- SELL whenever sentiment < -0.4
 INSERT INTO raw_trade_signals
-WITH sentiment_strategy_signals AS (
+WITH 
+  sentiment_strategy_signals AS (
     SELECT
         'sentiment' as strategy,
         '0.1.0' as strategy_version,
@@ -87,16 +90,21 @@ WITH sentiment_strategy_signals AS (
             'headline' VALUE headline,
             'sentiment' VALUE sentiment
         ) AS metadata,
-        price_updates.time_ltz as time_ltz
+        data_provider,
+        market_news.time_ltz as time_ltz
     FROM market_news
     JOIN price_updates
     ON price_updates.symbol = market_news.symbol
     -- use minute-level precision for the join
-    AND DATE_FORMAT(price_updates.time_ltz, 'yyyy-MM-dd HH:mm:00') = DATE_FORMAT(market_news.time_ltz, 'yyyy-MM-dd HH:mm:00')
+    AND (
+      DATE_FORMAT(price_updates.time_ltz, 'yyyy-MM-dd HH:mm:00') = DATE_FORMAT(market_news.time_ltz, 'yyyy-MM-dd HH:mm:00')
+      OR data_provider = 'news simulator' AND price_updates.time_ltz = '2022-12-31 00:59:00.000'
+    )
 )
 SELECT *
 FROM sentiment_strategy_signals
-WHERE signal IN ('BUY', 'SELL');
+WHERE signal IN ('BUY', 'SELL')
+AND data_provider = 'news simulator';
 
 
 -- Create a table for storing the cleaned trade signals. The idea is to filter down
@@ -111,6 +119,7 @@ CREATE TABLE single_position_trade_signals (
   shares BIGINT,
   signal VARCHAR(4),
   metadata STRING,
+  data_provider STRING,
   -- The METADATA attribute below ensures the timestamp for the Kafka record is set to the time_ltz value
   time_ltz TIMESTAMP(3) METADATA FROM 'timestamp',
     -- declare time_ltz as event time attribute and use 5 seconds delayed watermark strategy
@@ -136,6 +145,7 @@ WITH
             shares,
             signal,
             metadata,
+            data_provider,
             time_ltz,
             LAG(signal) OVER (PARTITION BY symbol ORDER BY time_ltz) as prev_signal
         FROM raw_trade_signals
@@ -149,6 +159,7 @@ WITH
             shares,
             signal,
             metadata,
+            data_provider,
             time_ltz,
             CASE WHEN signal = 'SELL' THEN 5 ELSE -5 END as adjusted_shares
         FROM buy_sell
@@ -164,6 +175,7 @@ WITH
         shares,
         signal,
         metadata,
+        data_provider,
         time_ltz
     FROM trades
     ORDER BY time_ltz;
@@ -180,7 +192,8 @@ SELECT
 FROM single_position_trade_signals
 WHERE strategy = 'sentiment'
 AND strategy_version = '0.1.0'
-AND symbol = 'TSLA';
+AND symbol = 'TSLA'
+AND data_provider <> 'news simulator';
 
 -- Intuition around the Profit / Loss query we showed earlier
 
