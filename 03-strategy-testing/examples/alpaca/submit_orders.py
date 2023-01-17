@@ -7,12 +7,12 @@ from kafka import KafkaConsumer
 from config import REDPANDA_BROKERS, REDPANDA_CONSUMER_GROUP
 from utils import alpaca_utils
 
-TOPIC = "raw-trade-signals"
+TOPIC = "trade-signals"
 consumer = KafkaConsumer(
     TOPIC,
     bootstrap_servers=REDPANDA_BROKERS,
     group_id=REDPANDA_CONSUMER_GROUP,
-    auto_offset_reset="earliest",
+    auto_offset_reset="latest",
     value_deserializer=lambda value: json.loads(value.decode("utf-8"))
     # add more configs here if you'd like
 )
