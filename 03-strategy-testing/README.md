@@ -71,7 +71,7 @@ Simulate news using the the simulate_news script, or wait until more recent news
 That's expected, since the trade signals were created from historical data and you don't want to submit orders if the signal has expired. See the next section for info on how to simulate a news article and submit an order from a fresh trade signal.
 
 ## Simulate News
-With the `submit_orders` script still running, open a new table, and run the following:
+With the `submit_orders` script still running, open a new tab, and run the following:
 
 ```sh
 cd 03-strategy-testing
