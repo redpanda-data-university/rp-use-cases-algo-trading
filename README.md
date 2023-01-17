@@ -6,7 +6,7 @@ This repository contains code examples for the Algorithmic Trading course from [
 
 - [Chapter 1: Flink intro][flink-intro] (creating Redpanda-backed Flink pipelines)
 - [Chapter 2: Data Collection][data-collection]
--  Chapter 3 (WIP)
+- [Chapter 3: Strategy Testing][strategy-testing]
 
 
 [rp]: https://redpanda.com/
@@ -14,6 +14,7 @@ This repository contains code examples for the Algorithmic Trading course from [
 
 [flink-intro]: /01-flink-intro
 [data-collection]: /02-data-collection
+[strategy-testing]: /03-strategy-testing
 
 ## Getting Started
 There are three steps you need to get started. It should take < 5 minutes.
