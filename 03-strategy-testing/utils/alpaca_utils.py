@@ -128,7 +128,12 @@ def get_historical_prices(
 
 
 def has_position(symbol):
-    return symbol in get_trading_client().get_all_positions()
+    try:
+        get_trading_client().get_open_position(symbol)
+        return True
+    except:
+        # the API returns an exception if the position doesn't exist
+        return False
 
 
 def get_pending_orders(symbol):
@@ -149,24 +154,30 @@ def submit_market_order(symbol, qty, side):
     position_open = has_position(symbol)
     pending_orders = get_pending_orders(symbol)
     has_pending = len(pending_orders) > 0
+    # don't place an order if a position is already open
     if position_open and side == OrderSide.BUY:
         print("order not placed. position already open")
         return
+    # if the client wants to sell and there are pending orders,
+    # cancel those
     elif has_pending and side == OrderSide.SELL:
         for order in pending_orders:
-            print(f"cancelling order: {order.id}")
+            print(f"canceling order: {order.id}")
             get_trading_client().cancel_order_by_id(order.id)
         return
+    # don't try to sell if a position isn't open
     elif not position_open and side == OrderSide.SELL:
         print("order not placed. no positions to close")
         return
+    # don't try to buy if orders are pending
     elif has_pending and side == OrderSide.BUY:
         print("order not placed. current orders pending")
         return
+    # otherwise, submit an order
     market_order_data = MarketOrderRequest(
         symbol=symbol,
         qty=qty,
         side=side,
-        time_in_force=TimeInForce.FOK,
+        time_in_force=TimeInForce.FOK, # fok = fill or kill
     )
     return get_trading_client().submit_order(order_data=market_order_data)
