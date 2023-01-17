@@ -16,7 +16,7 @@ ALPACA_URL = (
 
 # Redpanda configs
 REDPANDA_BROKERS = os.getenv("REDPANDA_BROKERS", "localhost:9092")
-REDPANDA_CONSUMER_GROUP = os.getenv("REDPANDA_CONSUMER_GROUP", "test")
+REDPANDA_CONSUMER_GROUP = os.getenv("REDPANDA_CONSUMER_GROUP", "dev")
 
 # Data pull configs
 BACKFILL_START = "2022-09-01"
