@@ -77,7 +77,7 @@ CREATE OR REPLACE TABLE price_updates (
     'connector' = 'kafka',
     'topic' = 'price-updates',
     'properties.bootstrap.servers' = 'redpanda-1:29092',
-    'properties.group.id' = 'test-group2',
+    'properties.group.id' = 'test-group',
     'properties.auto.offset.reset' = 'earliest',
     'format' = 'json'
 );
@@ -88,6 +88,7 @@ CREATE OR REPLACE TABLE market_news (
     headline VARCHAR,
     source VARCHAR,
     summary VARCHAR,
+    data_provider VARCHAR,
     `url` VARCHAR,
     symbol VARCHAR,
     sentiment DECIMAL,
@@ -99,7 +100,7 @@ CREATE OR REPLACE TABLE market_news (
     'connector' = 'kafka',
     'topic' = 'market-news',
     'properties.bootstrap.servers' = 'redpanda-1:29092',
-    'properties.group.id' = 'test-group2',
+    'properties.group.id' = 'test-group',
     'properties.auto.offset.reset' = 'earliest',
     'format' = 'json'
 );
