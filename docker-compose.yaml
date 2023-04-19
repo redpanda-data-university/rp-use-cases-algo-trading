@@ -2,7 +2,7 @@ version: '3.7'
 services:
   # Redpanda cluster
   redpanda-1:
-    image: docker.redpanda.com/vectorized/redpanda:v22.3.5
+    image: docker.redpanda.com/redpandadata/redpanda:v23.1.7
     container_name: redpanda-1
     command:
       - redpanda
