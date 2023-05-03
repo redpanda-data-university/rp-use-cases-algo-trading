@@ -35,7 +35,7 @@ services:
 
   # Want a two node Redpanda cluster? Uncomment this block :)
   # redpanda-2:
-  #   image: docker.redpanda.com/vectorized/redpanda:v23.1.8
+  #   image: docker.redpanda.com/redpandadata/redpanda:v23.1.8
   #   container_name: redpanda-2
   #   command:
   #     - redpanda
@@ -66,7 +66,7 @@ services:
   #     - 9093:9093
 
   redpanda-console:
-    image: docker.redpanda.com/vectorized/console:v2.2.4
+    image: docker.redpanda.com/redpandadata/console:v2.2.4
     container_name: redpanda-console
     entrypoint: /bin/sh
     command: -c "echo \"$$CONSOLE_CONFIG_FILE\" > /tmp/config.yml; /app/console"
