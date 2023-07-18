@@ -11,7 +11,7 @@ docker-compose up -d
 alias rpk="docker exec -ti redpanda-1 rpk"
 
 # create the source / sink topics
-rpk topic create names greetings trade trade-stats
+rpk topic create names greetings trades trade-stats
 ```
 
 If you want to pre-populate the source topics, run:
