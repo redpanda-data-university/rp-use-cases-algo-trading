@@ -1,5 +1,5 @@
 # Used for Killercoda. Same as the other file, but we remove Redpanda Console
-version: '3.9'
+version: '3.7'
 services:
   # Redpanda cluster
   redpanda-1:
@@ -93,5 +93,3 @@ services:
         rest.address: jobmanager
     volumes:
       - ./01-flink-intro/sql:/etc/sql
-    profiles:
-      - donotstart
