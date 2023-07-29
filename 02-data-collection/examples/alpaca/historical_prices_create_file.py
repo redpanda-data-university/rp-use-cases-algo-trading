@@ -45,6 +45,13 @@ with open(OUTPUT_FILE, mode="w", newline="") as txt_file:
             # Add an identifier for the data provider
             row[DATA_PROVIDER_KEY] = ALPACA
 
+            # Rename keys that are reserved words in Flink since
+            # we need to port this to Killercoda and there's a bug
+            # with escaping reserved words
+            row['price_open'] = row.pop('open')
+            row['price_close'] = row.pop('close')
+            row['timestamp_ms'] = row.pop('timestamp')
+
             # Convert the JSON record to a string
             json_record = json.dumps(row)
 

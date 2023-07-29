@@ -77,6 +77,11 @@ with open(OUTPUT_FILE, mode="w", newline="") as txt_file:
 
             article["symbol"] = search_symbol
 
+            # Rename keys that are reserved words in Flink since
+            # we need to port this to Killercoda and there's a bug
+            # with escaping reserved words
+            article['article_url'] = article.pop('url')
+
             # Produce the news article to Redpanda
             try:
                 # Convert the JSON record to a string
