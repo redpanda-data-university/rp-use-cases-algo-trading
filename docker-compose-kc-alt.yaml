@@ -79,7 +79,7 @@ services:
 
       # uncomment to run the "Trade Stats" pipeline from a file
       - -f
-      - /etc/sql/strategy.sql
+      - /etc/sql/strategy-ns.sql
 
       # Note: if you don't uncomment one of the pipelines above,
       # you'll be dropped into a SQL client CLI. This is a great for
