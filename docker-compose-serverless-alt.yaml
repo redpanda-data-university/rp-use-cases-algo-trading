@@ -58,6 +58,6 @@ services:
         jobmanager.rpc.address: jobmanager
         rest.address: jobmanager
     volumes:
-      - ./01-flink-intro/sql:/etc/sql
+      - ./03-strategy-testing/sql:/etc/sql:/etc/sql
     networks:
       - master_class
