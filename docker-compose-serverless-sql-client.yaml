@@ -1,4 +1,7 @@
 version: '3.7'
+networks:
+  master_class:
+    driver: bridge
 services:
   sql-client:
     container_name: sql-client
@@ -29,3 +32,5 @@ services:
         rest.address: jobmanager
     volumes:
       - ./01-flink-intro/sql:/etc/sql
+    networks:
+      - master_class
