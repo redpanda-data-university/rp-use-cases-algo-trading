@@ -6,7 +6,7 @@ from time import time
 from kafka import KafkaProducer
 from nltk.sentiment.vader import SentimentIntensityAnalyzer as SIA
 
-from config import REDPANDA_BROKERS
+from config import REDPANDA_BROKERS,USERNAME,PASSWORD
 
 # Create a sentiment analyzer
 sia = SIA()
