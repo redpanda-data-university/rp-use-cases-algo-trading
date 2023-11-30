@@ -1,0 +1,62 @@
+# Used for Killercoda. Same as the other file, but we remove Redpanda Console
+version: '3.7'
+services:
+  # Flink cluster
+  jobmanager:
+    container_name: jobmanager
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8081:8081
+    command: jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+
+  taskmanager:
+    container_name: taskmanager
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - jobmanager
+    command: taskmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 20
+
+  sql-client:
+    container_name: sql-client
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command:
+      - /opt/flink/bin/sql-client.sh
+      - embedded
+      - -l
+      - /opt/sql-client/lib
+
+      # uncomment to run the "Hello, Flink" pipeline from a file
+      # - -f
+      # - /etc/sql/hello_flink.sql
+
+      # uncomment to run the "Trade Stats" pipeline from a file
+      # - -f
+      # - /etc/sql/trade_stats.sql
+
+      # Note: if you don't uncomment one of the pipelines above,
+      # you'll be dropped into a SQL client CLI. This is a great for
+      # experimentation and pipeline development :)
+    depends_on:
+      - jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        rest.address: jobmanager
+    volumes:
+      - ./01-flink-intro/sql:/etc/sql
