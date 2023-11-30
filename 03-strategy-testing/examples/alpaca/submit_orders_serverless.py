@@ -9,17 +9,18 @@ from utils import alpaca_utils
 
 TOPIC = "trade-signals"
 consumer = KafkaConsumer(
-    TOPIC,
     bootstrap_servers=REDPANDA_BROKERS,
-    group_id=REDPANDA_CONSUMER_GROUP,
+    #group_id=REDPANDA_CONSUMER_GROUP,
     security_protocol='SASL_SSL',
     sasl_mechanism ='SCRAM-SHA-256',
     auto_offset_reset="latest",
     value_deserializer=lambda value: json.loads(value.decode("utf-8")),
     sasl_plain_username = USERNAME,
-    sasl_plain_password = PASSWORD
-    # add more configs here if you'd like
+    sasl_plain_password = PASSWORD,
+    enable_auto_commit=False,
+    consumer_timeout_ms=10000
 )
+consumer.subscribe(TOPIC)
 
 try:
     for msg in consumer:
