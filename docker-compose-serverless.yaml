@@ -1,9 +1,6 @@
-# Used for Killercoda. Same as the other file, but we remove Redpanda Console
 version: '3.7'
-networks:
-  master_class:
-    driver: bridge
 services:
+
   # Flink cluster
   jobmanager:
     container_name: jobmanager
@@ -17,8 +14,7 @@ services:
       - |
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
-    networks:
-      - master_class
+
   taskmanager:
     container_name: taskmanager
     build:
@@ -32,8 +28,7 @@ services:
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
         taskmanager.numberOfTaskSlots: 20
-    networks:
-      - master_class
+
   sql-client:
     container_name: sql-client
     build:
@@ -65,5 +60,3 @@ services:
         rest.address: jobmanager
     volumes:
       - ./01-flink-intro/sql:/etc/sql
-    networks:
-      - master_class
