@@ -18,6 +18,11 @@ ALPACA_URL = (
 REDPANDA_BROKERS = os.getenv("REDPANDA_BROKERS", "localhost:9092")
 REDPANDA_CONSUMER_GROUP = os.getenv("REDPANDA_CONSUMER_GROUP", "dev")
 
+#Serverless configs
+USERNAME = os.getenv("SERVERLESS_USERNAME", "myuser")
+PASSWORD = os.getenv("SERVERLESS_PASSWORD", "1234qwer")
+
+
 # Data pull configs
 BACKFILL_START = "2022-09-01"
 BACKFILL_END = "2023-01-01"
