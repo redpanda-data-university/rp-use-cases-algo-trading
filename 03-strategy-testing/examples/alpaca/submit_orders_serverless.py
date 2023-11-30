@@ -17,8 +17,7 @@ consumer = KafkaConsumer(
     value_deserializer=lambda value: json.loads(value.decode("utf-8")),
     sasl_plain_username = USERNAME,
     sasl_plain_password = PASSWORD,
-    enable_auto_commit=False,
-    consumer_timeout_ms=10000
+    enable_auto_commit=False
 )
 consumer.subscribe(TOPIC)
 
