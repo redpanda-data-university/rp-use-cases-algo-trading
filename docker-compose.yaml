@@ -1,92 +1,69 @@
 version: '3.7'
+networks:
+  redpanda_network:
+    driver: bridge
+volumes:
+  redpanda-0: null
+  redpanda-1: null
+  redpanda-2: null
 services:
-  # Redpanda cluster
-  redpanda-1:
-    image: docker.redpanda.com/redpandadata/redpanda:v23.1.8
-    container_name: redpanda-1
+  redpanda-0:
     command:
       - redpanda
       - start
-      - --smp
-      - '1'
-      - --reserve-memory
-      - 0M
-      - --overprovisioned
-      - --node-id
-      - '1'
-      - --kafka-addr
-      - PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
-      - --advertise-kafka-addr
-      - PLAINTEXT://redpanda-1:29092,OUTSIDE://localhost:9092
-      - --pandaproxy-addr
-      - PLAINTEXT://0.0.0.0:28082,OUTSIDE://0.0.0.0:8082
-      - --advertise-pandaproxy-addr
-      - PLAINTEXT://redpanda-1:28082,OUTSIDE://localhost:8082
-      - --rpc-addr
-      - 0.0.0.0:33145
-      - --advertise-rpc-addr
-      - redpanda-1:33145
+      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
+      # Address the broker advertises to clients that connect to the Kafka API.
+      # Use the internal addresses to connect to the Redpanda brokers'
+      # from inside the same Docker network.
+      # Use the external addresses to connect to the Redpanda brokers'
+      # from outside the Docker network.
+      - --advertise-kafka-addr internal://redpanda-0:9092,external://localhost:19092
+      - --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:18082
+      # Address the broker advertises to clients that connect to the HTTP Proxy.
+      - --advertise-pandaproxy-addr internal://redpanda-0:8082,external://localhost:18082
+      - --schema-registry-addr internal://0.0.0.0:8081,external://0.0.0.0:18081
+      # Redpanda brokers use the RPC API to communicate with each other internally.
+      - --rpc-addr redpanda-0:33145
+      - --advertise-rpc-addr redpanda-0:33145
+      # Mode dev-container uses well-known configuration properties for development in containers.
+      - --mode dev-container
+      # Tells Seastar (the framework Redpanda uses under the hood) to use 1 core on the system.
+      - --smp 1
+      - --default-log-level=info
+    image: docker.redpanda.com/redpandadata/redpanda:v24.2.2
+    container_name: redpanda-0
+    volumes:
+      - redpanda-0:/var/lib/redpanda/data
+    networks:
+      - redpanda_network
     ports:
-      # - 8081:8081
-      - 8082:8082
-      - 9092:9092
-      - 28082:28082
-      - 29092:29092
-
-  # Want a two node Redpanda cluster? Uncomment this block :)
-  # redpanda-2:
-  #   image: docker.redpanda.com/redpandadata/redpanda:v23.1.8
-  #   container_name: redpanda-2
-  #   command:
-  #     - redpanda
-  #     - start
-  #     - --smp
-  #     - '1'
-  #     - --reserve-memory
-  #     - 0M
-  #     - --overprovisioned
-  #     - --node-id
-  #     - '2'
-  #     - --seeds
-  #     - redpanda-1:33145
-  #     - --kafka-addr
-  #     - PLAINTEXT://0.0.0.0:29093,OUTSIDE://0.0.0.0:9093
-  #     - --advertise-kafka-addr
-  #     - PLAINTEXT://redpanda-2:29093,OUTSIDE://localhost:9093
-  #     - --pandaproxy-addr
-  #     - PLAINTEXT://0.0.0.0:28083,OUTSIDE://0.0.0.0:8083
-  #     - --advertise-pandaproxy-addr
-  #     - PLAINTEXT://redpanda-2:28083,OUTSIDE://localhost:8083
-  #     - --rpc-addr
-  #     - 0.0.0.0:33146
-  #     - --advertise-rpc-addr
-  #     - redpanda-2:33146
-  #   ports:
-  #     - 8083:8083
-  #     - 9093:9093
-
-  redpanda-console:
-    image: docker.redpanda.com/redpandadata/console:v2.2.4
+      - 18081:18081
+      - 18082:18082
+      - 19092:19092
+      - 19644:9644
+  console:
     container_name: redpanda-console
+    image: docker.redpanda.com/redpandadata/console:v2.7.1
+    networks:
+      - redpanda_network
     entrypoint: /bin/sh
-    command: -c "echo \"$$CONSOLE_CONFIG_FILE\" > /tmp/config.yml; /app/console"
+    command: -c 'echo "$$CONSOLE_CONFIG_FILE" > /tmp/config.yml; /app/console'
     environment:
       CONFIG_FILEPATH: /tmp/config.yml
       CONSOLE_CONFIG_FILE: |
         kafka:
-          brokers: ["redpanda-1:29092", "redpanda-2:29092"]
+          brokers: ["redpanda-0:9092"]
           schemaRegistry:
-            enabled: false
+            enabled: true
+            urls: ["http://redpanda-0:8081"]
         redpanda:
           adminApi:
             enabled: true
-            urls: ["http://redpanda-1:9644"]
-        connect:
-          enabled: false
+            urls: ["http://redpanda-0:9644"]
     ports:
       - 8080:8080
     depends_on:
-      - redpanda-1
+      - redpanda-0
 
   # Flink cluster
   jobmanager:
@@ -97,6 +74,8 @@ services:
     ports:
       - 8081:8081
     command: jobmanager
+    networks:
+      - redpanda_network
     environment:
       - |
         FLINK_PROPERTIES=
@@ -110,6 +89,8 @@ services:
     depends_on:
       - jobmanager
     command: taskmanager
+    networks:
+      - redpanda_network
     environment:
       - |
         FLINK_PROPERTIES=
@@ -140,6 +121,8 @@ services:
       # experimentation and pipeline development :)
     depends_on:
       - jobmanager
+    networks:
+      - redpanda_network
     environment:
       - |
         FLINK_PROPERTIES=
