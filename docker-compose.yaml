@@ -11,6 +11,11 @@ services:
       - redpanda
       - start
       - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
+      # Address the broker advertises to clients that connect to the Kafka API.
+      # Use the internal addresses to connect to the Redpanda brokers'
+      # from inside the same Docker network.
+      # Use the external addresses to connect to the Redpanda brokers'
+      # from outside the Docker network.
       - --advertise-kafka-addr internal://redpanda-0:9092,external://localhost:19092
       - --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:18082
       # Address the broker advertises to clients that connect to the HTTP Proxy.
@@ -35,6 +40,62 @@ services:
       - 18082:18082
       - 19092:19092
       - 19644:9644
+  redpanda-1:
+    command:
+      - redpanda
+      - start
+      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:29092
+      - --advertise-kafka-addr internal://redpanda-1:9092,external://localhost:29092
+      - --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:28082
+      - --advertise-pandaproxy-addr internal://redpanda-1:8082,external://localhost:28082
+      - --schema-registry-addr internal://0.0.0.0:8081,external://0.0.0.0:28081
+      - --rpc-addr redpanda-1:33145
+      - --advertise-rpc-addr redpanda-1:33145
+      - --mode dev-container
+      - --smp 1
+      - --default-log-level=info
+      - --seeds redpanda-0:33145
+    image: docker.redpanda.com/redpandadata/redpanda:v24.2.2
+    container_name: redpanda-1
+    volumes:
+      - redpanda-1:/var/lib/redpanda/data
+    networks:
+      - redpanda_network
+    ports:
+      - 28081:28081
+      - 28082:28082
+      - 29092:29092
+      - 29644:9644
+    depends_on:
+      - redpanda-0
+  redpanda-2:
+    command:
+      - redpanda
+      - start
+      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:39092
+      - --advertise-kafka-addr internal://redpanda-2:9092,external://localhost:39092
+      - --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:38082
+      - --advertise-pandaproxy-addr internal://redpanda-2:8082,external://localhost:38082
+      - --schema-registry-addr internal://0.0.0.0:8081,external://0.0.0.0:38081
+      - --rpc-addr redpanda-2:33145
+      - --advertise-rpc-addr redpanda-2:33145
+      - --mode dev-container
+      - --smp 1
+      - --default-log-level=info
+      - --seeds redpanda-0:33145
+    image: docker.redpanda.com/redpandadata/redpanda:v24.2.2
+    container_name: redpanda-2
+    volumes:
+      - redpanda-2:/var/lib/redpanda/data
+    networks:
+      - redpanda_network
+    ports:
+      - 38081:38081
+      - 38082:38082
+      - 39092:39092
+      - 39644:9644
+    depends_on:
+      - redpanda-0
   console:
     container_name: redpanda-console
     image: docker.redpanda.com/redpandadata/console:v2.7.0
@@ -58,68 +119,3 @@ services:
       - 8080:8080
     depends_on:
       - redpanda-0
-  # Flink cluster
-  jobmanager:
-    container_name: jobmanager
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - 8081:8081
-    command: jobmanager
-    networks:
-      - redpanda_network
-    environment:
-      - |
-        FLINK_PROPERTIES=
-        jobmanager.rpc.address: jobmanager
-
-  taskmanager:
-    container_name: taskmanager
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:
-      - jobmanager
-    command: taskmanager
-    networks:
-      - redpanda_network
-    environment:
-      - |
-        FLINK_PROPERTIES=
-        jobmanager.rpc.address: jobmanager
-        taskmanager.numberOfTaskSlots: 20
-
-  sql-client:
-    container_name: sql-client
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command:
-      - /opt/flink/bin/sql-client.sh
-      - embedded
-      - -l
-      - /opt/sql-client/lib
-
-      # uncomment to run the "Hello, Flink" pipeline from a file
-      # - -f
-      # - /etc/sql/hello_flink.sql
-
-      # uncomment to run the "Trade Stats" pipeline from a file
-      # - -f
-      # - /etc/sql/trade_stats.sql
-
-      # Note: if you don't uncomment one of the pipelines above,
-      # you'll be dropped into a SQL client CLI. This is a great for
-      # experimentation and pipeline development :)
-    depends_on:
-      - jobmanager
-    networks:
-      - redpanda_network
-    environment:
-      - |
-        FLINK_PROPERTIES=
-        jobmanager.rpc.address: jobmanager
-        rest.address: jobmanager
-    volumes:
-      - ./01-flink-intro/sql:/etc/sql
