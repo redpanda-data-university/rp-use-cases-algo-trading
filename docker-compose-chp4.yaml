@@ -98,9 +98,9 @@ services:
       context: .
       dockerfile: Dockerfile
     command: >
-      sh -c "/opt/flink/bin/sql-client.sh embedded -l /opt/sql-client/lib
-      -f /etc/sql/init.sql &&
-      exec /opt/flink/bin/sql-client.sh embedded -l /opt/sql-client/lib"
+      /opt/flink/bin/sql-client.sh embedded
+      -l /opt/flink/lib
+      --init /etc/sql/init.sql
     environment:
       - |
         FLINK_PROPERTIES=
