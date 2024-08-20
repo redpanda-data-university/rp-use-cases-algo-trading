@@ -97,23 +97,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command:
-      - /opt/flink/bin/sql-client.sh
-      - embedded
-      - -l
-      - /opt/sql-client/lib
-
-      # uncomment to run the "Hello, Flink" pipeline from a file
-      # - -f
-      # - /etc/sql/hello_flink.sql
-
-      # Prepare for next step
-      - -f
-      - /etc/sql/trade_stats.sql
-
-      # Note: if you don't uncomment one of the pipelines above,
-      # you'll be dropped into a SQL client CLI. This is a great for
-      # experimentation and pipeline development :)
+    command: >
+      sh -c "/opt/flink/bin/sql-client.sh embedded -l /opt/sql-client/lib
+      -f /etc/sql/init.sql &&
+      exec /opt/flink/bin/sql-client.sh embedded -l /opt/sql-client/lib"
     environment:
       - |
         FLINK_PROPERTIES=
