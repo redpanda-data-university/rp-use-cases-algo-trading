@@ -47,3 +47,4 @@ CREATE OR REPLACE TABLE market_news (
     'properties.auto.offset.reset' = 'earliest',
     'format' = 'json'
 );
+

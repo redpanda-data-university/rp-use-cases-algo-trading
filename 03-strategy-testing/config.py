@@ -15,7 +15,7 @@ ALPACA_URL = (
 )
 
 # Redpanda configs
-REDPANDA_BROKERS = os.getenv("REDPANDA_BROKERS", "localhost:9092")
+REDPANDA_BROKERS = os.getenv("REDPANDA_BROKERS", "localhost:19092")
 REDPANDA_CONSUMER_GROUP = os.getenv("REDPANDA_CONSUMER_GROUP", "dev")
 
 #Serverless configs
