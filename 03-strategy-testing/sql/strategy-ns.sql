@@ -18,7 +18,7 @@ CREATE OR REPLACE TABLE price_updates (
 ) WITH (
     'connector' = 'kafka',
     'topic' = 'price-updates',
-    'properties.bootstrap.servers' = 'redpanda-1:29092',
+    'properties.bootstrap.servers' = 'redpanda-0:9092',
     'properties.group.id' = 'dev',
     'properties.auto.offset.reset' = 'earliest',
     'format' = 'json'
@@ -42,7 +42,7 @@ CREATE OR REPLACE TABLE market_news (
 ) WITH (
     'connector' = 'kafka',
     'topic' = 'market-news',
-    'properties.bootstrap.servers' = 'redpanda-1:29092',
+    'properties.bootstrap.servers' = 'redpanda-0:9092',
     'properties.group.id' = 'dev',
     'properties.auto.offset.reset' = 'earliest',
     'format' = 'json'
@@ -75,7 +75,7 @@ CREATE TABLE trade_signals (
 ) WITH (
   'connector' = 'kafka',
   'topic' = 'trade-signals',
-  'properties.bootstrap.servers' = 'redpanda-1:29092',
+  'properties.bootstrap.servers' = 'redpanda-0:9092',
   'properties.group.id' = 'dev',
   'properties.auto.offset.reset' = 'earliest',
   'format' = 'json'
@@ -153,7 +153,7 @@ CREATE TABLE single_position_trade_signals (
 ) WITH (
   'connector' = 'kafka',
   'topic' = 'single-position-trade-signals',
-  'properties.bootstrap.servers' = 'redpanda-1:29092',
+  'properties.bootstrap.servers' = 'redpanda-0:9092',
   'properties.group.id' = 'dev',
   'properties.auto.offset.reset' = 'earliest',
   'format' = 'json'
