@@ -99,7 +99,7 @@ services:
       dockerfile: Dockerfile
     command: >
       /opt/flink/bin/sql-client.sh embedded
-      -l /opt/flink/lib
+      -l /opt/sql-client/lib
       --init /etc/sql/init.sql
     environment:
       - |
