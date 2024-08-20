@@ -103,9 +103,13 @@ services:
       - -l
       - /opt/sql-client/lib
 
+      # uncomment to run the "Hello, Flink" pipeline from a file
+      # - -f
+      # - /etc/sql/hello_flink.sql
+
       # uncomment to run the "Trade Stats" pipeline from a file
-      - -f
-      - /etc/sql/strategy-serverless.sql
+      # - -f
+      # - /etc/sql/trade_stats.sql
 
       # Note: if you don't uncomment one of the pipelines above,
       # you'll be dropped into a SQL client CLI. This is a great for
